@@ -1,7 +1,20 @@
+using Microsoft.EntityFrameworkCore;
+using MVC_Shop;
+
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 builder.Services.AddControllersWithViews();
+
+// add dataBase context
+builder.Services.AddDbContext<AppDbContext>(options =>
+{
+    //options.UseSqlServer("name = SqlServer");
+    string? connectionString = builder.Configuration.GetConnectionString("SqlServer");
+    options.UseSqlServer(connectionString);
+
+
+});
 
 var app = builder.Build();
 

@@ -1,12 +1,26 @@
-﻿@{
+﻿@model IEnumerable<Product>
+@{
     ViewData["Title"] = "Товари";
 }
 
-<div>
-    <h1 style="text-align: center">
-        Тут будуть наші товари
-    </h1>
-    <div style="text-align: center">
-        <img src="https://cdn.sell2.brightspotcdn.com/dims4/default/7211555/2147483647/strip/true/crop/1464x725+0+0/resize/1464x725!/quality/90/?url=https%3A%2F%2Fsell2-production-sell2.s3.us-west-2.amazonaws.com%2Fbrightspot%2Fb5%2F94%2F3316a67d4d8a95afbcafdba86f81%2Fhigh-demand-products-collage.jpg" alt="Products" width="1000px"/>
+<div class="products-page">
+    <h1 class="page-title">Список товарів</h1>
+
+    <div class="products-grid">
+        @foreach (var product in Model)
+        {
+            <div class="product-card">
+                <div class="product-image">
+                    <img src="@product.Image" alt="@product.Name" />
+                </div>
+                <div class="product-body">
+                    <h3 class="product-title">@product.Name</h3>
+                    <p class="product-category">Категорія: @product.Category?.Name</p>
+                    <p class="product-description">@product.Description</p>
+                    <p class="product-price">Ціна: @product.Price ₴</p>
+                    <p class="product-count">Кількість: @product.Count</p>
+                </div>
+            </div>
+        }
     </div>
 </div>
