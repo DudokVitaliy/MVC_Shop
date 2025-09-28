@@ -3,23 +3,53 @@
     ViewData["Title"] = "Категорії";
 }
 
-<h1 class="text-center">Список категорій</h1>
-<div>
+@if (Model.Count() > 0)
+{
+    <div class="d-flex">
+        <h1 class="text-center">Список категорій</h1>
+        <div class="text-end flex-grow-1">
+            <a asp-action="Create" class="btn btn-dark">Додати категорію</a>
+        </div>
+    </div>
     <table class="table table-striped">
         <thead>
             <tr>
-                <th>Id</th>
-                <th>Назва</th>
+                <th class="text-center">Id</th>
+                <th class="text-center">Назва</th>
+                <th class="text-center"></th>
             </tr>
         </thead>
         <tbody>
-            @foreach(var category in Model)
+            @foreach (var category in Model)
             {
                 <tr>
-                    <td>@category.Id</td>
-                    <td>@category.Name</td>
+                    <td class="text-center">@category.Id</td>
+                    <td class="text-center">@category.Name</td>
+                    <td class="text-end">
+                        <a asp-action="Update" asp-route-id="@category.Id" class="btn btn-info">Змінити</a>
+                        <button onclick="openModal('category' ,@category.Id)" class="btn btn-danger">Видалити</button>
+                    </td>
                 </tr>
             }
         </tbody>
     </table>
+}
+else
+{
+    <h2 class="text-center">Категорії не знайдено</h2>
+}
+
+<!-- Modal -->
+<div class="modal fade" id="categoryDeleteModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="exampleModalLongTitle">Ви впевнені?</h5>
+            </div>
+            <div class="modal-footer">
+                <button onclick="closeModal()" class="btn btn-dark">Скасувати</button>
+                <a id="deleteCategoryAction" class="btn btn-danger">Видалити</a>
+            </div>
+        </div>
+    </div>
 </div>

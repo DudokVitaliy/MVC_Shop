@@ -3,9 +3,13 @@
     ViewData["Title"] = "Товари";
 }
 
-<div class="products-page">
-    <h1 class="page-title">Список товарів</h1>
-
+<div class="products-page"> 
+    <div class="d-flex">
+        <h1 class="page-title">Список товарів</h1>
+        <div class="text-end flex-grow-1">
+            <a asp-action="Create" class="btn btn-dark">Додати товар</a>
+        </div>
+    </div>
     <div class="products-grid">
         @foreach (var product in Model)
         {
@@ -19,8 +23,28 @@
                     <p class="product-description">@product.Description</p>
                     <p class="product-price">Ціна: @product.Price ₴</p>
                     <p class="product-count">Кількість: @product.Count</p>
+                    <div class="text-center">
+                        <a asp-action="Update" asp-route-id="@product.Id" class="btn btn-info">Змінити</a>
+                        <button onclick="openModal('product', @product.Id)" class="btn btn-danger">Видалити</button>
+                    </div>
                 </div>
+
             </div>
         }
+    </div>
+</div>
+
+<!-- Modal -->
+<div class="modal fade" id="productDeleteModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="exampleModalLongTitle">Ви впевнені?</h5>
+            </div>
+            <div class="modal-footer">
+                <button onclick="closeModal()" class="btn btn-dark">Скасувати</button>
+                <a id="deleteProductAction" class="btn btn-danger">Видалити</a>
+            </div>
+        </div>
     </div>
 </div>

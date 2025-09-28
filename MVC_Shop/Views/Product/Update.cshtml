@@ -1,0 +1,42 @@
+﻿@model Product
+@{
+    ViewData["Title"] = "Редагування товару";
+}
+
+<div class="w-50 m-auto border-2 p-2">
+    <h1 class="text-center">Редагування товару</h1>
+    <form class="w-75 m-auto" asp-action="Update" method="post">
+        <div class="mb-3 mt-3 row">
+            <input type="hidden" asp-for="Id" />
+            <label>Назва</label>
+            <div>
+                <input type="text" class="form-control" asp-for="Name" />
+            </div>
+            <label>Посилання на фото</label>
+            <div>
+                <input type="url" class="form-control" asp-for="Image" />
+            </div>
+            <label>Категорія</label>
+            <div>
+                <select class="form-control" asp-for="CategoryId" asp-items="ViewBag.Categories"></select>
+                <span asp-validation-for="CategoryId" class="text-danger"></span>
+            </div>
+            <label>Опис</label>
+            <div>
+                <input type="text" class="form-control" asp-for="Description" />
+            </div>
+            <label>Ціна</label>
+            <div>
+                <input type="number" class="form-control" asp-for="Price" />
+            </div>
+            <label>Кількість</label>
+            <div>
+                <input type="number" class="form-control" asp-for="Count" />
+            </div>
+        </div>
+        <div class="m-2 d-flex p-1">
+            <input type="submit" value="Зберегти" class="flex-grow-1 m-1 btn btn-success" />
+            <a asp-action="Index" class="flex-grow-1 m-1 btn btn-dark">Повернутися</a>
+        </div>
+    </form>
+</div>
