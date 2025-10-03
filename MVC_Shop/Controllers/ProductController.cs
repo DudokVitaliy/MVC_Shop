@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using MVC_Shop.Models;
+using MVC_Shop.Repositories.Category;
 using MVC_Shop.Repositories.Product;
 
 namespace MVC_Shop.Controllers
@@ -9,12 +10,14 @@ namespace MVC_Shop.Controllers
     public class ProductController : Controller
     {
         private readonly IProductRepository _productRepository;
+        private readonly ICategoryRepository _categoryRepository;
         private readonly AppDbContext _context;
 
-        public ProductController(AppDbContext context, IProductRepository productRepository)
+        public ProductController(AppDbContext context, IProductRepository productRepository, ICategoryRepository categoryRepository)
         {
             _context = context;
             _productRepository = productRepository;
+            _categoryRepository = categoryRepository;
         }
 
         public IActionResult Index()
@@ -38,7 +41,7 @@ namespace MVC_Shop.Controllers
 
         public IActionResult Create()
         {
-            ViewBag.Categories = new SelectList(_context.Categories, "Id", "Name");
+            ViewBag.Categories = new SelectList(_categoryRepository.Categories, "Id", "Name");
             return View();
         }
 
@@ -49,7 +52,7 @@ namespace MVC_Shop.Controllers
             if (await _productRepository.IsExistAsync(model.Name) && 
                 await _productRepository.IsExistIdAsync(model.Id))
             {
-                ViewBag.Categories = new SelectList(_context.Categories, "Id", "Name");
+                ViewBag.Categories = new SelectList(_categoryRepository.Categories, "Id", "Name");
                 return View(model);
                 
             }
@@ -65,7 +68,7 @@ namespace MVC_Shop.Controllers
             {
                 return RedirectToAction("Index");
             }
-            ViewBag.Categories = new SelectList(_context.Categories, "Id", "Name", model.CategoryId);
+            ViewBag.Categories = new SelectList(_categoryRepository.Categories, "Id", "Name", model.CategoryId);
             return View(model);
         }
 
@@ -74,9 +77,9 @@ namespace MVC_Shop.Controllers
         public async Task<IActionResult> Update(Product model)
         {
             if (await _productRepository.IsExistAsync(model.Name) &&
-                !_context.Products.Any(c => c.Id == model.Id))
+                !_productRepository.Products.Any(c => c.Id == model.Id))
             {
-                ViewBag.Categories = new SelectList(_context.Categories, "Id", "Name", model.CategoryId);
+                ViewBag.Categories = new SelectList(_categoryRepository.Categories, "Id", "Name", model.CategoryId);
                 return View(model);
             }
 
