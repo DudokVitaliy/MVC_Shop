@@ -1,5 +1,6 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿ using Microsoft.AspNetCore.Mvc;
 using MVC_Shop.Models;
+using MVC_Shop.Repositories.Category;
 
 namespace MVC_Shop.Controllers
 {
@@ -7,13 +8,15 @@ namespace MVC_Shop.Controllers
     {
 
         private readonly AppDbContext _context;
-        public CategoryController (AppDbContext context)
+        private readonly ICategoryRepository _categoryRepository;
+        public CategoryController (AppDbContext context, ICategoryRepository categoryRepository)
         {
+            _categoryRepository = categoryRepository;
             _context = context;
         }
         public IActionResult Index()
         {
-            IEnumerable<Category> categories = _context.Categories;
+            IEnumerable<Category> categories = _categoryRepository.Categories;
 
             return View(categories);
         }
@@ -23,20 +26,20 @@ namespace MVC_Shop.Controllers
         }
         [HttpPost]
         [ValidateAntiForgeryToken] // - для захисту від CSRF-запитів
-        public IActionResult Create(Category model)
+        public async Task<IActionResult> Create(Category model)
         {
-           bool res = _context.Categories.Any(c => c.Name.ToLower() == model.Name.ToLower());
+           bool res = await _categoryRepository.IsExistAsync(model.Name);
             if (res)
             {
                 return View();
             }
-            _context.Categories.Add(model);
-            _context.SaveChanges();
+            await _categoryRepository.CreateAsync(model);
+            await _categoryRepository.SaveChangesAsync();
             return RedirectToAction("Index");
         }
-        public IActionResult Update(int id)
+        public async Task<IActionResult> Update(int id)
         {
-            var model = _context.Categories.Find(id);
+            var model = await _categoryRepository.GetByIdAsync(id);
             if (model == null)
             {
                 return Index();
@@ -46,27 +49,22 @@ namespace MVC_Shop.Controllers
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public IActionResult Update(Category model)
+        public async Task<IActionResult> Update(Category model)
         {
-            bool res = _context.Categories.Any(c => c.Name.ToLower() == model.Name.ToLower());
+            bool res = await _categoryRepository.IsExistAsync(model.Name);
             if (res)
             {
                 return View();
             }
-            _context.Update(model);
-            _context.SaveChanges();
+            _categoryRepository.Update(model);
+            await _categoryRepository.SaveChangesAsync();
             return RedirectToAction("Index");
         }
 
-        public IActionResult Delete(int id)
+        public async Task<IActionResult> Delete(int id)
         {
-            var model = _context.Categories.Find(id);
-            if (model == null)
-            {
-                return Index();
-            }
-            _context.Categories.Remove(model);
-            _context.SaveChanges();
+            await _categoryRepository.DeleteAsync(id);
+            await _categoryRepository.SaveChangesAsync();
             return RedirectToAction("Index");
 
         }

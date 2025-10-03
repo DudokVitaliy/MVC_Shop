@@ -2,22 +2,40 @@
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using MVC_Shop.Models;
+using MVC_Shop.Repositories.Product;
 
 namespace MVC_Shop.Controllers
 {
     public class ProductController : Controller
     {
+        private readonly IProductRepository _productRepository;
         private readonly AppDbContext _context;
-        public ProductController(AppDbContext context)
+
+        public ProductController(AppDbContext context, IProductRepository productRepository)
         {
             _context = context;
+            _productRepository = productRepository;
         }
+
         public IActionResult Index()
         {
-            IEnumerable<Product> products = _context.Products
+            IEnumerable<Product> products = _productRepository.Products
                 .Include(p => p.Category);
             return View(products);
         }
+
+        public async Task<IActionResult> ByCategory(string categoryName)
+        {
+            var products = await _productRepository.GetProductsByCategoryNameAsync(categoryName);
+            return View("Index", products);
+        }
+
+        public async Task<IActionResult> ByPrice(float min, float max)
+        {
+            var products = await _productRepository.GetProductsByPriceRangeAsync(min, max);
+            return View("Index", products);
+        }
+
         public IActionResult Create()
         {
             ViewBag.Categories = new SelectList(_context.Categories, "Id", "Name");
@@ -26,55 +44,51 @@ namespace MVC_Shop.Controllers
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public IActionResult Create(Product model)
+        public async Task<IActionResult> Create(Product model)
         {
-            bool res = _context.Products.Any(c => c.Name.ToLower() == model.Name.ToLower());
-            if (res)
+            if (await _productRepository.IsExistAsync(model.Name) && 
+                await _productRepository.IsExistIdAsync(model.Id))
             {
-                return View();
+                ViewBag.Categories = new SelectList(_context.Categories, "Id", "Name");
+                return View(model);
+                
             }
-            _context.Products.Add(model);
-            _context.SaveChanges();
+
+            await _productRepository.CreateAsync(model);
             return RedirectToAction("Index");
         }
-        public IActionResult Update(int id)
+
+        public async Task<IActionResult> Update(int id)
         {
-            var model = _context.Products.Find(id);
+            var model = await _productRepository.GetByIdAsync(id);
             if (model == null)
             {
-                return Index();
+                return RedirectToAction("Index");
             }
-            ViewBag.Categories = new SelectList(_context.Categories, "Id", "Name");
+            ViewBag.Categories = new SelectList(_context.Categories, "Id", "Name", model.CategoryId);
             return View(model);
         }
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public IActionResult Update(Product model)
+        public async Task<IActionResult> Update(Product model)
         {
-            bool res = _context.Products.Any(c => c.Name.ToLower() == model.Name.ToLower() && c.Id != model.Id);
-            if (res)
+            if (await _productRepository.IsExistAsync(model.Name) &&
+                !_context.Products.Any(c => c.Id == model.Id))
             {
-                ViewBag.Categories = new SelectList(_context.Categories, "Id", "Name");
+                ViewBag.Categories = new SelectList(_context.Categories, "Id", "Name", model.CategoryId);
                 return View(model);
             }
 
-            _context.Update(model);
-            _context.SaveChanges();
+            _productRepository.Update(model);
+            await _productRepository.SaveChangesAsync();
             return RedirectToAction("Index");
         }
 
-        public IActionResult Delete(int id)
+        public async Task<IActionResult> Delete(int id)
         {
-            var model = _context.Products.Find(id);
-            if (model == null)
-            {
-                return Index();
-            }
-            _context.Products.Remove(model);
-            _context.SaveChanges();
+            await _productRepository.DeleteAsync(id);
             return RedirectToAction("Index");
-
         }
     }
 }

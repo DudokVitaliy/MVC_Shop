@@ -1,5 +1,7 @@
 using Microsoft.EntityFrameworkCore;
 using MVC_Shop;
+using MVC_Shop.Repositories.Category;
+using MVC_Shop.Repositories.Product;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -15,6 +17,8 @@ builder.Services.AddDbContext<AppDbContext>(options =>
 
 
 });
+builder.Services.AddScoped<ICategoryRepository, CategoryRepository>();
+builder.Services.AddScoped<IProductRepository, ProductRepository>();
 
 var app = builder.Build();
 
