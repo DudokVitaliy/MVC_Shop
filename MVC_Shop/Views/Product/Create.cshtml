@@ -1,4 +1,4 @@
-﻿@model Product
+﻿@model CreateProductVM
 @{
     ViewData["Title"] = "Створення товару";
 }
@@ -10,6 +10,12 @@
             <label>Назва</label>
             <div>
                 <input type="text" class="form-control" asp-for="Name" />
+            </div>
+            <div style="color: red;" class="form-text ms-1">
+                <span asp-validation-for="Name"></span>
+            </div>
+            <div style="color: red;" class="form-text ms-1">
+                <span asp-validation-for="UniqueNameError"></span>
             </div>
             <label>Посилання на фото</label>
             <div>
@@ -28,9 +34,15 @@
             <div>
                 <input type="number" class="form-control" asp-for="Price" />
             </div>
+            <div style="color: red;" class="form-text ms-1">
+                <span asp-validation-for="Price"></span>
+            </div>
             <label>Кількість</label>
             <div>
                 <input type="number" class="form-control" asp-for="Count" />
+            </div>
+            <div style="color: red;" class="form-text ms-1">
+                <span asp-validation-for="Count"></span>
             </div>
         </div>
         <div class="m-2 d-flex p-1">

@@ -1,21 +1,33 @@
-using System.Diagnostics;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using MVC_Shop.Models;
+using MVC_Shop.Repositories.Category;
+using MVC_Shop.Repositories.Product;
+using System.Diagnostics;
 
 namespace MVC_Shop.Controllers
 {
     public class HomeController : Controller
     {
         private readonly ILogger<HomeController> _logger;
+        private readonly IProductRepository _productRepository;
+        private readonly ICategoryRepository _categoryRepository;
 
-        public HomeController(ILogger<HomeController> logger)
+        public HomeController(ILogger<HomeController> logger, IProductRepository productRepository, ICategoryRepository categoryRepository)
         {
             _logger = logger;
+            _productRepository = productRepository;
+            _categoryRepository = categoryRepository;
         }
 
         public IActionResult Index()
         {
-            return View();
+            var viewModel = new ViewModels.Home.HomeVM
+            {
+                Products = _productRepository.Products.Include(p => p.Category).ToList(),
+                Categories = _categoryRepository.Categories.ToList()
+            };
+            return View(viewModel);
         }
 
         public IActionResult Privacy()
@@ -32,5 +44,22 @@ namespace MVC_Shop.Controllers
         {
             return View(new ErrorViewModel { RequestId = Activity.Current?.Id ?? HttpContext.TraceIdentifier });
         }
+        public IActionResult ByCategory(string categoryName)
+        {
+            var products = _productRepository.Products
+                .Where(p => p.Category.Name == categoryName)
+                .Include(p => p.Category)
+                .ToList();
+
+            var viewModel = new ViewModels.Home.HomeVM
+            {
+                Products = products,
+                Categories = _categoryRepository.Categories.ToList()
+            };
+
+            ViewBag.SelectedCategory = categoryName;
+            return View("Index", viewModel);
+        }
+
     }
 }

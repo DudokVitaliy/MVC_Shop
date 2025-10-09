@@ -1,8 +1,84 @@
-﻿@{
+﻿@model HomeVM
+@{
     ViewData["Title"] = "Home Page";
 }
 
-<div class="text-center">
-    <h1 class="display-4">Welcome</h1>
-    <p>Learn about <a href="https://learn.microsoft.com/aspnet/core">building Web apps with ASP.NET Core</a>.</p>
+<div class="container py-4">
+
+    @* Categories *@
+    <div class="d-flex justify-content-center flex-wrap gap-2 mb-4">
+        @foreach (var category in Model.Categories)
+        {
+            <a asp-controller="Home"
+               asp-action="ByCategory"
+               asp-route-categoryName="@category.Name"
+               class="btn btn-outline-success fw-semibold px-4 py-2 shadow-sm">
+                @category.Name
+            </a>
+        }
+        <a asp-controller="Home" asp-action="Index"
+           class="btn btn-outline-secondary fw-semibold px-4 py-2 shadow-sm">
+            Усі товари
+        </a>
+    </div>
+
+    @if (ViewBag.SelectedCategory != null)
+    {
+        <h3 class="text-center text-primary mb-4">
+            Категорія: @ViewBag.SelectedCategory
+        </h3>
+    }
+
+    @* Products *@
+    <div class="row g-4">
+        @foreach (var product in Model.Products)
+        {
+            <div class="col-12 col-sm-6 col-md-4 col-lg-3 d-flex align-items-stretch">
+                <div class="card shadow-sm border-0 h-100">
+                    <img src="@product.Image" class="card-img-top" alt="@product.Name" style="height: 180px; object-fit: cover;">
+                    <div class="card-body d-flex flex-column">
+                        <h5 class="card-title text-truncate" title="@product.Name">@product.Name</h5>
+                        <p class="card-text text-muted flex-grow-1" style="font-size: 0.9rem;">
+                            @product.Description
+                        </p>
+                        <div class="d-flex justify-content-between align-items-center mt-2">
+                            <span class="fw-bold text-success" style="font-size: 1.2rem;">@product.Price грн</span>
+                            <a href="#" class="btn btn-primary btn-sm">Додати у кошик</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        }
+    </div>
+
 </div>
+
+<style>
+    /* Hover ефект для карточок */
+    .card:hover {
+        transform: translateY(-5px);
+        transition: 0.3s;
+        box-shadow: 0 8px 20px rgba(0,0,0,0.15);
+    }
+
+    /* Обмежуємо висоту тексту опису і додаємо крапки, якщо довгий */
+    .card-text {
+        display: -webkit-box;
+        -webkit-line-clamp: 3;
+        -webkit-box-orient: vertical;
+        overflow: hidden;
+    }
+
+    /* Кнопки категорій */
+    .btn-outline-success:hover {
+        background-color: #28a745;
+        color: #fff;
+        transition: 0.3s;
+    }
+
+    .btn-outline-secondary:hover {
+        background-color: #6c757d;
+        color: #fff;
+        transition: 0.3s;
+    }
+</style>

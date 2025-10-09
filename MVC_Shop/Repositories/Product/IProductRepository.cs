@@ -13,6 +13,7 @@
         Task<List<Models.Product>> GetProductsByPriceRangeAsync(float min, float max);
         Task<bool> IsExistAsync(string name);
         Task<bool> IsExistIdAsync(int id);
+        Task<bool> IsExistAsync(string name, int? excludeId = null);
 
     }
 }

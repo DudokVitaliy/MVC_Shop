@@ -1,6 +1,7 @@
 ﻿ using Microsoft.AspNetCore.Mvc;
 using MVC_Shop.Models;
 using MVC_Shop.Repositories.Category;
+using MVC_Shop.ViewModels.Category;
 
 namespace MVC_Shop.Controllers
 {
@@ -26,13 +27,19 @@ namespace MVC_Shop.Controllers
         }
         [HttpPost]
         [ValidateAntiForgeryToken] // - для захисту від CSRF-запитів
-        public async Task<IActionResult> Create(Category model)
+        public async Task<IActionResult> Create(CreateCategoryVM viewModel)
         {
-           bool res = await _categoryRepository.IsExistAsync(model.Name);
+            if (!ModelState.IsValid)
+            {
+                return View(viewModel);
+            }
+            bool res = await _categoryRepository.IsExistAsync(viewModel.Name ?? string.Empty);
             if (res)
             {
-                return View();
+                ModelState.AddModelError("UniqueError", $"Категорія '{viewModel.Name}' вже існує!");
+                return View(viewModel);
             }
+            var model = new Category { Name = viewModel.Name ?? string.Empty};
             await _categoryRepository.CreateAsync(model);
             await _categoryRepository.SaveChangesAsync();
             return RedirectToAction("Index");
@@ -42,22 +49,41 @@ namespace MVC_Shop.Controllers
             var model = await _categoryRepository.GetByIdAsync(id);
             if (model == null)
             {
-                return Index();
+                return RedirectToAction("Index");
             }
-            return View(model);
+
+            var viewModel = new UpdateCategoryVM
+            {
+                Id = model.Id,
+                Name = model.Name
+            };
+
+            return View(viewModel);
         }
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Update(Category model)
+        public async Task<IActionResult> Update(UpdateCategoryVM viewModel)
         {
-            bool res = await _categoryRepository.IsExistAsync(model.Name);
+            if (!ModelState.IsValid)
+            {
+                return View(viewModel);
+            }
+
+            bool res = await _categoryRepository.IsExistAsync(viewModel.Name ?? string.Empty);
             if (res)
             {
-                return View();
+                ModelState.AddModelError("UniqueNameError", $"Категорія '{viewModel.Name}' вже існує");
+                return View(viewModel);
             }
-            _categoryRepository.Update(model);
-            await _categoryRepository.SaveChangesAsync();
+
+            var model = await _categoryRepository.GetByIdAsync(viewModel.Id);
+            if (model != null)
+            {
+                model.Name = viewModel.Name ?? "";
+                _categoryRepository.Update(model);
+                await _categoryRepository.SaveChangesAsync();
+            }
             return RedirectToAction("Index");
         }
 

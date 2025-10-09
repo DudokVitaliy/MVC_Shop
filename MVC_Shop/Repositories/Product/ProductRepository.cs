@@ -76,5 +76,12 @@ namespace MVC_Shop.Repositories.Product
         {
             return await _context.Products.AnyAsync(c => c.Id == id);
         }
+        public async Task<bool> IsExistAsync(string name, int? excludeId = null)
+        {
+            if (excludeId.HasValue)
+                return await _context.Products.AnyAsync(p => p.Name == name && p.Id != excludeId.Value);
+            else
+                return await _context.Products.AnyAsync(p => p.Name == name);
+        }
     }
 }
