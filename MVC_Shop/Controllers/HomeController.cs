@@ -47,7 +47,7 @@ namespace MVC_Shop.Controllers
         public IActionResult ByCategory(string categoryName)
         {
             var products = _productRepository.Products
-                .Where(p => p.Category.Name == categoryName)
+                .Where(p => p.Category != null && p.Category.Name == categoryName)
                 .Include(p => p.Category)
                 .ToList();
 

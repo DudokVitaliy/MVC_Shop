@@ -13,14 +13,50 @@ namespace MVC_Shop.Controllers
         private readonly IProductRepository _productRepository;
         private readonly ICategoryRepository _categoryRepository;
         private readonly AppDbContext _context;
+        private IWebHostEnvironment _webHostEnvironment;
 
-        public ProductController(AppDbContext context, IProductRepository productRepository, ICategoryRepository categoryRepository)
+        public ProductController(AppDbContext context, IProductRepository productRepository, 
+            ICategoryRepository categoryRepository, IWebHostEnvironment webHostEnvironment)
         {
             _context = context;
             _productRepository = productRepository;
             _categoryRepository = categoryRepository;
+            _webHostEnvironment = webHostEnvironment;
         }
+        private string? SaveImage(IFormFile? image)
+        {
+            if(image == null || image.Length == 0)
+            {
+                return null;
+            }
+            string[] types = image.ContentType.Split('/'); 
+            if (types[0] != "image" || types.Length != 2)
+            {
+                return null;
+            }
+            string imageName = $"{ Guid.NewGuid().ToString()}.{types[1]}";
+            string imagePath = Path.Combine(_webHostEnvironment.WebRootPath, "images", imageName);
+            
+            using (var stream = new FileStream(imagePath, FileMode.Create))
+            {
+                using (var imageStream = image.OpenReadStream())
+                {
+                    imageStream.CopyTo(stream);
+                }
+            }
+            return imageName;
+        }
+        private void DeleteImage(string? imageName)
+        {
+            if (string.IsNullOrEmpty(imageName))
+                return;
 
+            string fullPath = Path.Combine(_webHostEnvironment.WebRootPath, "images", imageName);
+            if (System.IO.File.Exists(fullPath))
+            {
+                System.IO.File.Delete(fullPath);
+            }
+        }
         public IActionResult Index()
         {
             IEnumerable<Product> products = _productRepository.Products
@@ -48,7 +84,7 @@ namespace MVC_Shop.Controllers
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create(CreateProductVM viewModel)
+        public async Task<IActionResult> Create([FromForm] CreateProductVM viewModel)
         {
             if (!ModelState.IsValid)
             {
@@ -67,7 +103,7 @@ namespace MVC_Shop.Controllers
                 Name = viewModel.Name,
                 Description = viewModel.Description,
                 Price = viewModel.Price ?? 0,
-                Image = viewModel.Image,
+                Image = SaveImage(viewModel.Image),
                 Count = viewModel.Count ?? 0,
                 CategoryId = viewModel.CategoryId
             };
@@ -102,41 +138,50 @@ namespace MVC_Shop.Controllers
         {
             if (!ModelState.IsValid)
             {
-                return View(viewModel);
-            }
-            if (await _productRepository.IsExistAsync(viewModel.Name, viewModel.Id))
-            {
-                ModelState.AddModelError("UniqueNameError", $"Товар з іменем '{viewModel.Name}' вже існує!");
-                ViewBag.Categories = new SelectList(_categoryRepository.Categories, "Id", "Name");
-                return View(viewModel);
-
-            }
-            if (await _productRepository.IsExistAsync(viewModel.Name) &&
-                !_productRepository.Products.Any(c => c.Id == viewModel.Id))
-            {
                 ViewBag.Categories = new SelectList(_categoryRepository.Categories, "Id", "Name", viewModel.CategoryId);
                 return View(viewModel);
             }
+
+            if (await _productRepository.IsExistAsync(viewModel.Name, viewModel.Id))
+            {
+                ModelState.AddModelError("UniqueNameError", $"Товар з іменем '{viewModel.Name}' вже існує!");
+                ViewBag.Categories = new SelectList(_categoryRepository.Categories, "Id", "Name", viewModel.CategoryId);
+                return View(viewModel);
+            }
+
             var model = await _productRepository.GetByIdAsync(viewModel.Id);
             if (model == null)
             {
                 return RedirectToAction("Index");
             }
+
+            if (viewModel.NewImage != null && viewModel.NewImage.Length > 0)
+            {
+                DeleteImage(model.Image);
+                model.Image = SaveImage(viewModel.NewImage);
+            }
+
             model.Name = viewModel.Name;
             model.Description = viewModel.Description;
             model.Price = viewModel.Price ?? 0;
-            model.Image = viewModel.Image;
             model.Count = viewModel.Count ?? 0;
             model.CategoryId = viewModel.CategoryId;
 
             _productRepository.Update(model);
             await _productRepository.SaveChangesAsync();
+
             return RedirectToAction("Index");
         }
 
+
         public async Task<IActionResult> Delete(int id)
         {
-            await _productRepository.DeleteAsync(id);
+            var product = await _productRepository.GetByIdAsync(id);
+            if (product != null)
+            {
+                DeleteImage(product.Image);
+                await _productRepository.DeleteAsync(id);
+            }
             return RedirectToAction("Index");
         }
     }

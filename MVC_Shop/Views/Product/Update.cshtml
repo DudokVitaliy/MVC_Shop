@@ -5,7 +5,7 @@
 
 <div class="w-50 m-auto border-2 p-2">
     <h1 class="text-center">Редагування товару</h1>
-    <form class="w-75 m-auto" asp-action="Update" method="post">
+    <form class="w-75 m-auto" asp-action="Update" method="post" enctype="multipart/form-data">
         <div class="mb-3 mt-3 row">
             <input type="hidden" asp-for="Id" />
             <label>Назва</label>
@@ -18,10 +18,13 @@
             <div style="color: red;" class="form-text ms-1">
                 <span asp-validation-for="UniqueNameError"></span>
             </div>
-            <label>Посилання на фото</label>
-            <div>
-                <input type="url" class="form-control" asp-for="Image" />
+            <label>Поточне зображення</label>
+            <div class="mb-2">
+                <img src="~/images/@Model.Image" alt="@Model.Name" width="150" class="rounded border" />
             </div>
+
+            <label>Нове зображення (необов'язково)</label>
+            <input type="file" class="form-control" asp-for="NewImage" accept="image/*" />
             <label>Категорія</label>
             <div>
                 <select class="form-control" asp-for="CategoryId" asp-items="ViewBag.Categories"></select>

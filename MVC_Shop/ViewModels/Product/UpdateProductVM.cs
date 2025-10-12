@@ -18,5 +18,6 @@ namespace MVC_Shop.ViewModels.Product
         public int? Count { get; set; }
         public int CategoryId { get; set; }
         public string? UniqueNameError { get; set; }
+        public IFormFile? NewImage { get; set; }
     }
 }

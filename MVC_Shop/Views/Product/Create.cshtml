@@ -5,7 +5,7 @@
 
 <div class="w-50 m-auto border-2 p-2">
     <h1 class="text-center">Створення товару</h1>
-    <form class="w-75 m-auto" asp-action="Create" method="post">
+    <form class="w-75 m-auto" asp-action="Create" method="post" enctype="multipart/form-data">
         <div class="mb-3 mt-3 row">
             <label>Назва</label>
             <div>
@@ -19,7 +19,7 @@
             </div>
             <label>Посилання на фото</label>
             <div>
-                <input type="url" class="form-control" asp-for="Image" />
+                <input type="file" class="form-control" asp-for="Image" accept="image/*" />
             </div>
             <label>Категорія</label>
             <div>

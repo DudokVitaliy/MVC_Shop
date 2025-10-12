@@ -11,11 +11,12 @@ namespace MVC_Shop.ViewModels.Product
         [Required(ErrorMessage = "Ціна не може бути пустою!")]
         [Range(0, Double.MaxValue, ErrorMessage ="Значення не може бути меншим за 0!")]
         public double? Price { get; set; }
-        public string? Image { get; set; }
+        //public string? Image { get; set; }
         [Required(ErrorMessage = "К-сть не може бути пустою!")]
         [Range(0, int.MaxValue, ErrorMessage = "Значення не може бути меншим за 0!")]
         public int? Count { get; set; }
         public int CategoryId { get; set; }
         public string? UniqueNameError { get; set; }
+        public IFormFile? Image { get; set; }
     }
 }
