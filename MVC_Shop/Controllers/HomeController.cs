@@ -60,6 +60,18 @@ namespace MVC_Shop.Controllers
             ViewBag.SelectedCategory = categoryName;
             return View("Index", viewModel);
         }
+        public async Task<IActionResult> Detail(int id)
+        {
+            var product = await _productRepository.Products
+                .Include(p => p.Category)
+                .FirstOrDefaultAsync(p => p.Id == id);
 
+            if (product == null)
+            {
+                return RedirectToAction("Index");
+            }
+
+            return View(product);
+        }
     }
 }

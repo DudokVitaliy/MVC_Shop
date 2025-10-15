@@ -1,0 +1,27 @@
+﻿@model Product
+
+<div class="card m-2 p-2 product-card @(Model.Count == 0 ? "opacity-25" : "")" style="max-width: 18rem;">
+    <div class="w-100">
+        <a asp-action="Detail" asp-route-id="@Model.Id">
+            <img src="~/images/@(string.IsNullOrEmpty(Model.Image) ? "No_Image_Available.jpg" : Model.Image)"
+                 class="product-card-cover w-100" alt="@Model.Name">
+        </a>
+    </div>
+    <div class="d-flex flex-column">
+        <a asp-action="Detail" asp-route-id="@Model.Id" class="product-card-title">@Model.Name</a>
+        @if (Model.Count > 0)
+        {
+            <span class="product-card-exists">Є в наявності</span>
+            <div class="d-flex">
+                <span class="product-card-price flex-grow-1">@Model.Price ₴</span>
+                <div class="product-card-cart">
+                <i class="bi bi-bag product-card-cart-icon flex-grow-0"></i>
+                </div>
+            </div>
+        }
+        else
+        {
+            <span class="product-card-end">Немає в наявності</span>
+        }
+    </div>
+</div>

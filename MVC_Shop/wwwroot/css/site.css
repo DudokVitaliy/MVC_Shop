@@ -29,3 +29,73 @@ body {
 .form-floating > .form-control-plaintext:focus::placeholder, .form-floating > .form-control:focus::placeholder {
   text-align: start;
 }
+
+.product-card:hover {
+    transform: scale(1.05, 1.05);
+    box-shadow: 5px 5px 5px grey;
+    cursor: pointer;
+}
+
+.product-card-cover {
+    object-fit: contain;
+    height: 225px;
+}
+
+.product-card-title {
+    font-size: 0.9em;
+    margin: 4px 0px;
+    text-decoration: none;
+    color: black;
+}
+
+    .product-card-title:hover {
+        text-decoration: underline;
+        color: red;
+        cursor: pointer;
+    }
+
+.product-card-price {
+    margin: 4px 0px;
+    font-size: 1em;
+    color: black;
+    font-weight: bold;
+}
+
+.product-card-exists {
+    font-size: 0.8em;
+    color: green;
+    font-weight: bold;
+    margin: 4px 0px;
+}
+
+.product-card-end {
+    font-size: 0.8em;
+    color: grey;
+    font-weight: bold;
+    margin: 4px 0px;
+}
+
+.product-card-cart {
+    padding: 0px 4px;
+}
+
+    .product-card-cart:hover {
+        background: rgba(0, 0, 0, 0.1);
+        cursor: pointer;
+    }
+
+.product-card-cart-icon {
+    font-size: 1.5em;
+    font-weight: bold;
+    color: forestgreen;
+}
+
+.nav-cart {
+    font-size: 1.5em;
+    margin-right: 20px;
+}
+
+    .nav-cart:hover {
+        cursor: pointer;
+        opacity: 0.65;
+    }
