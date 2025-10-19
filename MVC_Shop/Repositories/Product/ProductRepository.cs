@@ -1,7 +1,8 @@
-﻿
-
-using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Metadata.Internal;
 using MVC_Shop.Models;
+using MVC_Shop.ViewModels;
+using System.Linq;
 
 namespace MVC_Shop.Repositories.Product
 {
@@ -82,6 +83,37 @@ namespace MVC_Shop.Repositories.Product
                 return await _context.Products.AnyAsync(p => p.Name == name && p.Id != excludeId.Value);
             else
                 return await _context.Products.AnyAsync(p => p.Name == name);
+        }
+        public IQueryable<Models.Product> GetByCategory(string category, Pagination? pagination = null)
+        {
+            if (string.IsNullOrEmpty(category))
+                return GetProducts(pagination);
+
+            category = category.ToLower();
+
+            var products = Products
+                .Include(p => p.Category)
+                .Where(p => p.Category != null && p.Category.Name.ToLower() == category);
+
+            // Передаємо саме відфільтровану колекцію
+            return SetPagination(products, pagination);
+        }
+
+        public IQueryable<Models.Product> GetProducts(Pagination? pagination = null)
+        {
+            var products = Products.Include(p => p.Category);
+            return SetPagination(products, pagination);
+        }
+        private IQueryable<Models.Product> SetPagination(IQueryable<Models.Product> products, Pagination? pagination = null)
+        {
+            pagination ??= new Pagination();
+
+            pagination.PageCount = (int)Math.Ceiling((double)products.Count() / pagination.PageSize);
+            pagination.Page = pagination.Page > pagination.PageCount || pagination.Page <= 0 ? 1 : pagination.Page;
+
+            return products
+                .Skip((pagination.Page - 1) * pagination.PageSize)
+                .Take(pagination.PageSize);
         }
     }
 }

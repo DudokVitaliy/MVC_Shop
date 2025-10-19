@@ -1,4 +1,6 @@
-﻿namespace MVC_Shop.Repositories.Product
+﻿using MVC_Shop.Models;
+using MVC_Shop.ViewModels;
+namespace MVC_Shop.Repositories.Product
 {
     public interface IProductRepository
     {
@@ -14,6 +16,8 @@
         Task<bool> IsExistAsync(string name);
         Task<bool> IsExistIdAsync(int id);
         Task<bool> IsExistAsync(string name, int? excludeId = null);
+        public IQueryable<Models.Product> GetByCategory( string category, Pagination? pagination = null);
+        public IQueryable<Models.Product> GetProducts(Pagination? pagination = null);
 
     }
 }

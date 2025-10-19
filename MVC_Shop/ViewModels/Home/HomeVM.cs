@@ -2,8 +2,10 @@
 {
     public class HomeVM
     {
-        public IEnumerable<Models.Product> Products { get; set; } = new List<Models.Product>();
-        public IEnumerable<Models.Category> Categories { get; set; } = new List<Models.Category>();
+        public ProductListVM ProductList { get; set; } = new ProductListVM();
+        public IEnumerable<Models.Category> Categories { get; set; } = [];
+        public string? CategoryName { get; set; }
+
 
     }
 }

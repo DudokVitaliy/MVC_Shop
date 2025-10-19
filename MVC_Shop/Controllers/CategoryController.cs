@@ -1,4 +1,5 @@
 ﻿ using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using MVC_Shop.Models;
 using MVC_Shop.Repositories.Category;
 using MVC_Shop.ViewModels.Category;
@@ -15,12 +16,30 @@ namespace MVC_Shop.Controllers
             _categoryRepository = categoryRepository;
             _context = context;
         }
-        public IActionResult Index()
+        public async Task<IActionResult> Index(int page = 1)
         {
-            IEnumerable<Category> categories = _categoryRepository.Categories;
+            int pageSize = Settings.PaginationPageSize;
 
-            return View(categories);
+            var categoriesQuery = _categoryRepository.Categories.AsQueryable();
+
+            int totalItems = await categoriesQuery.CountAsync();
+
+            var categories = await categoriesQuery
+                .Skip((page - 1) * pageSize)
+                .Take(pageSize)
+                .ToListAsync();
+
+            var model = new CategoryListVM
+            {
+                Categories = categories,
+                CurrentPage = page,
+                PageSize = pageSize,
+                TotalItems = totalItems
+            };
+
+            return View(model);
         }
+
         public IActionResult Create()
         {
             return View();

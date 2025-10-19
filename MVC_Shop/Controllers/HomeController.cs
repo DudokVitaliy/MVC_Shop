@@ -3,7 +3,10 @@ using Microsoft.EntityFrameworkCore;
 using MVC_Shop.Models;
 using MVC_Shop.Repositories.Category;
 using MVC_Shop.Repositories.Product;
+using MVC_Shop.ViewModels;
+using MVC_Shop.ViewModels.Home;
 using System.Diagnostics;
+using System.Net.WebSockets;
 
 namespace MVC_Shop.Controllers
 {
@@ -20,15 +23,43 @@ namespace MVC_Shop.Controllers
             _categoryRepository = categoryRepository;
         }
 
-        public IActionResult Index()
+
+        public IActionResult Index(string? category, int? page)
         {
-            var viewModel = new ViewModels.Home.HomeVM
+            int currentPage = page ?? 1;
+
+            var pagination = new Pagination
             {
-                Products = _productRepository.Products.Include(p => p.Category).ToList(),
-                Categories = _categoryRepository.Categories.ToList()
+                Page = currentPage,
+                PageSize = Settings.PaginationPageSize
             };
+
+            var products =
+                !string.IsNullOrEmpty(category)
+                ? _productRepository.GetByCategory(category, pagination)
+                : _productRepository.GetProducts(pagination);
+
+            var productsList = new ProductListVM
+            {
+                Pagination = pagination,
+                Products = products
+            };
+
+            var viewModel = new HomeVM
+            {
+                Categories = _categoryRepository.Categories,
+                CategoryName = category,
+                ProductList = new ProductListVM
+                {
+                    Products = products,
+                    Pagination = pagination
+                }
+            };
+
             return View(viewModel);
         }
+
+
 
         public IActionResult Privacy()
         {
@@ -43,22 +74,6 @@ namespace MVC_Shop.Controllers
         public IActionResult Error()
         {
             return View(new ErrorViewModel { RequestId = Activity.Current?.Id ?? HttpContext.TraceIdentifier });
-        }
-        public IActionResult ByCategory(string categoryName)
-        {
-            var products = _productRepository.Products
-                .Where(p => p.Category != null && p.Category.Name == categoryName)
-                .Include(p => p.Category)
-                .ToList();
-
-            var viewModel = new ViewModels.Home.HomeVM
-            {
-                Products = products,
-                Categories = _categoryRepository.Categories.ToList()
-            };
-
-            ViewBag.SelectedCategory = categoryName;
-            return View("Index", viewModel);
         }
         public async Task<IActionResult> Detail(int id)
         {

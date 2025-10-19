@@ -57,12 +57,31 @@ namespace MVC_Shop.Controllers
                 System.IO.File.Delete(fullPath);
             }
         }
-        public IActionResult Index()
+        public async Task<IActionResult> Index(int page = 1)
         {
-            IEnumerable<Product> products = _productRepository.Products
-                .Include(p => p.Category);
-            return View(products);
+            int pageSize = Settings.PaginationPageSize;
+
+            var productsQuery = _productRepository.Products.Include(p => p.Category);
+
+            int totalItems = await productsQuery.CountAsync();
+
+            var products = await productsQuery
+                .Skip((page - 1) * pageSize)
+                .Take(pageSize)
+                .ToListAsync();
+
+            var model = new ProductVM
+            {
+                Products = products,
+                CurrentPage = page,
+                PageSize = pageSize,
+                TotalItems = totalItems
+            };
+
+            return View(model);
         }
+
+
 
         public async Task<IActionResult> ByCategory(string categoryName)
         {
