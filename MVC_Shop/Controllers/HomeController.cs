@@ -3,9 +3,12 @@ using Microsoft.EntityFrameworkCore;
 using MVC_Shop.Models;
 using MVC_Shop.Repositories.Category;
 using MVC_Shop.Repositories.Product;
+using MVC_Shop.Services;
 using MVC_Shop.ViewModels;
+using MVC_Shop.ViewModels.Cart;
 using MVC_Shop.ViewModels.Home;
 using System.Diagnostics;
+using System.Globalization;
 using System.Net.WebSockets;
 
 namespace MVC_Shop.Controllers
@@ -23,9 +26,21 @@ namespace MVC_Shop.Controllers
             _categoryRepository = categoryRepository;
         }
 
+        public IActionResult AddToCart(int productId)
+        {
+            HttpContext.Session.AddToCart(productId);
+            return RedirectToAction("Index");
+        }
+
+        public IActionResult RemoveFromCart(int productId)
+        {
+            HttpContext.Session.RemoveFromCart(productId);
+            return RedirectToAction("Index");
+        }
 
         public IActionResult Index(string? category, int? page)
         {
+
             int currentPage = page ?? 1;
 
             var pagination = new Pagination

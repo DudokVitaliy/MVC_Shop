@@ -1,4 +1,5 @@
-﻿<!DOCTYPE html>
+﻿@inject IHttpContextAccessor HttpContextAccessor
+<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="utf-8" />
@@ -45,7 +46,13 @@
                         </li>
                     </ul>
                 </div>
-            </div>
+
+                </div>
+                <a>
+                    <div class="nav-cart">
+                    <i class="bi bi-cart"></i> (@HttpContextAccessor.HttpContext.Session.CartCount())
+                    </div>
+                </a>
         </nav>
     </header>
     <div class="container">

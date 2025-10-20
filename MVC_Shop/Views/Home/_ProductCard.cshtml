@@ -1,4 +1,6 @@
-﻿@model Product
+﻿@using MVC_Shop.Services
+@inject IHttpContextAccessor HttpContextAccessor
+@model Product
 
 <div class="card m-2 p-2 product-card @(Model.Count == 0 ? "opacity-25" : "")" style="max-width: 18rem;">
     <div class="w-100">
@@ -15,7 +17,18 @@
             <div class="d-flex">
                 <span class="product-card-price flex-grow-1">@Model.Price ₴</span>
                 <div class="product-card-cart">
-                <i class="bi bi-bag product-card-cart-icon flex-grow-0"></i>
+                    @if (HttpContextAccessor.HttpContext.Session.ItemInCart(Model.Id))
+                    {
+                        <a asp-controller="Home" asp-action="RemoveFromCart" asp-route-productId="@Model.Id">
+                            <i class="bi bi-bag-fill product-card-cart-icon flex-grow-0"></i>
+                        </a>
+                    }
+                    else
+                    {
+                        <a asp-controller="Home" asp-action="AddToCart" asp-route-productId="@Model.Id">
+                            <i class="bi bi-bag product-card-cart-icon flex-grow-0"></i>
+                        </a>
+                    }
                 </div>
             </div>
         }
