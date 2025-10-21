@@ -1,7 +1,11 @@
+using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Identity.UI.Services;
 using Microsoft.EntityFrameworkCore;
 using MVC_Shop;
+using MVC_Shop.Models;
 using MVC_Shop.Repositories.Category;
 using MVC_Shop.Repositories.Product;
+using MVC_Shop.Services;
 using PD421_MVC_Shop.Initializer;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -18,8 +22,27 @@ builder.Services.AddDbContext<AppDbContext>(options =>
 
 
 });
+
+
+// add identity
+builder.Services.AddIdentity<ApplicationUser, IdentityRole>(options =>
+{
+    options.User.RequireUniqueEmail = true;
+
+    options.Password.RequireDigit = true; // �����
+    options.Password.RequiredUniqueChars = 1; // ���������� ������
+    options.Password.RequireLowercase = true; // �������� �����
+    options.Password.RequireUppercase = true; // ������ �����
+    options.Password.RequireNonAlphanumeric = true; // �� ����� � �� �����
+    options.Password.RequiredLength = 8; // ��������� �������
+})
+    .AddEntityFrameworkStores<AppDbContext>()
+    .AddDefaultUI()
+    .AddDefaultTokenProviders();
+
 builder.Services.AddScoped<ICategoryRepository, CategoryRepository>();
 builder.Services.AddScoped<IProductRepository, ProductRepository>();
+builder.Services.AddTransient<IEmailSender, EmailSender>();
 
 // add session
 builder.Services.AddHttpContextAccessor();
@@ -45,6 +68,7 @@ app.UseSession();
 app.UseHttpsRedirection();
 app.UseRouting();
 
+app.UseAuthentication();
 app.UseAuthorization();
 
 app.MapStaticAssets();
@@ -53,5 +77,6 @@ app.MapControllerRoute(
     name: "default",
     pattern: "{controller=Home}/{action=Index}/{id?}")
     .WithStaticAssets();
+app.MapRazorPages();
 app.Seed();
 app.Run();
