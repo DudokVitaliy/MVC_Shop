@@ -6,6 +6,41 @@ namespace MVC_Shop.Services
 {
     public static class CartService
     {
+        public static void DecreaseCount(this ISession session, int productId)
+        {
+            var items = session.GetCartItems();
+            var item = items.Find(x => x.ProductId == productId);
+            if (item != null)
+            {
+                if (item.Count > 1)
+                {
+                    item.Count--;
+                }
+                var json = JsonSerializer.Serialize(items);
+                session.SetString(Settings.CartKey, json);
+            }
+        }
+
+        public static void ClearCart(this ISession session)
+        {
+            var json = JsonSerializer.Serialize(new List<CartItemVM>());
+            session.SetString(Settings.CartKey, json);
+        }
+
+        public static void IncreaseCount(this ISession session, int productId, int maxCount)
+        {
+            var items = session.GetCartItems();
+            var item = items.Find(x => x.ProductId == productId);
+            if (item != null)
+            {
+                if (item.Count < maxCount)
+                {
+                    item.Count++;
+                }
+                var json = JsonSerializer.Serialize(items);
+                session.SetString(Settings.CartKey, json);
+            }
+        }
         public static List<CartItemVM> GetCartItems(this ISession session)
         {
             var data = session.GetString(Settings.CartKey);

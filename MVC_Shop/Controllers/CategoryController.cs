@@ -7,7 +7,7 @@ using MVC_Shop.ViewModels.Category;
 
 namespace MVC_Shop.Controllers
 {
-    [Authorize(Roles = "Admin")]
+    [Authorize(Roles = "admin")]
     public class CategoryController : Controller
     {
 

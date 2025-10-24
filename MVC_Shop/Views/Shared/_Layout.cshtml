@@ -59,12 +59,17 @@
                     <partial name="_LoginPartial" />
                 </div>
                 </div>
-            
-            <a>
-                    <div class="nav-cart">
-                    <i class="bi bi-cart"></i> (@HttpContextAccessor.HttpContext.Session.CartCount())
-                    </div>
+
+            <div class="nav-cart d-flex align-items-center ms-3">
+                <a asp-controller="Cart" class="text-dark text-decoration-none position-relative">
+                    <i class="bi bi-cart3 fs-4"></i>
+                    <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger">
+                        @HttpContextAccessor.HttpContext.Session.CartCount()
+                    </span>
                 </a>
+            </div>
+
+
         </nav>
     </header>
     <div class="container">

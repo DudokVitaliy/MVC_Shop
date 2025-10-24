@@ -9,7 +9,7 @@ using MVC_Shop.ViewModels.Product;
 
 namespace MVC_Shop.Controllers
 {
-    [Authorize(Roles = "Admin")]
+    [Authorize(Roles = "admin")]
     public class ProductController : Controller
     {
         private readonly IProductRepository _productRepository;

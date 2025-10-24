@@ -14,7 +14,7 @@ namespace MVC_Shop.Repositories.Product
             _context = context;
         }
 
-        public IQueryable<Models.Product> Products => _context.Products;
+        public IQueryable<Models.Product> Products => _context.Products.OrderByDescending(p => p.Count);
 
         public async Task CreateAsync(Models.Product product)
         {
