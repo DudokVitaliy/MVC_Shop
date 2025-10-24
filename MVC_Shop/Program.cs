@@ -5,6 +5,7 @@ using MVC_Shop;
 using MVC_Shop.Models;
 using MVC_Shop.Repositories.Category;
 using MVC_Shop.Repositories.Product;
+using MVC_Shop.Repositories.Users;
 using MVC_Shop.Services;
 using PD421_MVC_Shop.Initializer;
 
@@ -43,6 +44,8 @@ builder.Services.AddIdentity<ApplicationUser, IdentityRole>(options =>
 builder.Services.AddScoped<ICategoryRepository, CategoryRepository>();
 builder.Services.AddScoped<IProductRepository, ProductRepository>();
 builder.Services.AddTransient<IEmailSender, EmailSender>();
+builder.Services.AddScoped<IUsersRepository, UsersRepository>();
+
 
 // add session
 builder.Services.AddHttpContextAccessor();
@@ -78,5 +81,5 @@ app.MapControllerRoute(
     pattern: "{controller=Home}/{action=Index}/{id?}")
     .WithStaticAssets();
 app.MapRazorPages();
-app.Seed();
+await app.Seed();
 app.Run();

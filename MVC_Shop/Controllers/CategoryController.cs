@@ -1,4 +1,5 @@
-﻿ using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using MVC_Shop.Models;
 using MVC_Shop.Repositories.Category;
@@ -6,6 +7,7 @@ using MVC_Shop.ViewModels.Category;
 
 namespace MVC_Shop.Controllers
 {
+    [Authorize(Roles = "Admin")]
     public class CategoryController : Controller
     {
 
